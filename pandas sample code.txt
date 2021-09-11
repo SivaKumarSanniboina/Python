@@ -1,0 +1,88 @@
+import pandas as pd
+
+df=pd.read_excel("D:\product.xlsx")
+df['Value 4']=df['Value 1']+df['Value 2']+df['Value 3']
+def double_num(num):
+    return num*2
+df['Doubled']=df['Value 4'].apply(double_num)
+writer=pd.ExcelWriter('newbook.xlsx')
+df.to_excel(writer,'new_sheet')
+writer.save()
+print(df.head())
+
+
+
+
+
+
+
+
+
+
+
+import pandas as pd
+df = pd.read_excel('D:\productdetails.xlsx')
+print(df.head())
+
+print("read operation")
+
+df_filter= df[df['Category'] == 'chocolate']
+df_filter1= df[df['Category'] == 'snacks']
+print(df_filter)
+print(df_filter1)
+store = pd.ExcelWriter('chocolate_product.xlsx')
+df_filter.to_excel(store,'sheet')
+store.save()
+write = pd.ExcelWriter('snacksproduct.xlsx')
+df_filter1.to_excel(write,'sheet')
+write.save()
+print("products stored in separate file")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+regex example ::
+
+
+import re
+
+#phone ="987vvv6666567"
+phone = input("Enter the number:  ")
+matchresult = re.match("[9]{1}[0-9]{9}$", phone)
+if matchresult is None:
+    print("Match Failed")
+else:
+    print("Phone no. is Valid")
+
+
+
+
+
+
+
+
+
+import re
+#cardno = "4556-4456-4434-7488"
+cardno = input("Enter the card number:   ")
+cardpattern = "[0-9]{4}[-]{1}[0-9]{4}[-]{1}[0-9]{4}[-]{1}[0-9]{4}"
+
+matchresult = re.match(cardpattern, cardno)
+if matchresult is None:
+    print("Match Failed")
+else:
+    print("Cardno Input Valid")
