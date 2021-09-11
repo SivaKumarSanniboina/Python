@@ -1,0 +1,846 @@
+1. UNLOAD insurance details from the insurance table to an excel file that is meant for farmers alone.
+
+
+
+ANSWER :
+
+UNLOAD:
+
+
+connection.json :
+
+{
+  "dbname":"Insurance",
+  "user":"postgres",
+  "host":"localhost",
+  "password":"Sivakumar@1997"
+}
+
+
+dbconndemo.py:
+
+import psycopg2
+
+try:
+    conn = psycopg2.connect("dbname='INSURANCE' user='postgres' host='localhost' password='Sivakumar@1997'")
+    print(conn)
+except:
+    print("Unable to connect to database")
+
+
+
+logdemo.py:
+
+
+import logging
+
+# Create and configure logger
+logging.basicConfig(filename="newfile.log",
+                    format='%(asctime)s %(levelno)s %(message)s',
+                    filemode='a',
+                    level=logging.DEBUG)
+
+# Creating an object
+logger = logging.getLogger()
+
+# Setting the threshold of logger to DEBUG
+#logger.setLevel(logging.DEBUG)
+
+# Test messages
+logger.debug("Harmless debug Message")
+logger.info("Just an information")
+logger.warning("Its a Warning")
+logger.error("Did you try to divide by zero")
+logger.critical("Internet is down")
+
+
+readconnfromjson.py:
+
+#reading connection properties from json file
+
+import json
+jsonFile = open("connection.json",)
+jsonReader=json.load(jsonFile)
+dbname= jsonReader["dbname"]
+user= jsonReader["user"]
+host=jsonReader["host"]
+password=jsonReader["password"]
+
+
+exception.py:
+
+try:
+    pfile = open("insurance.txt", "w")
+    pfile.write("INSURANCENAME\n")
+    pfile.write("FARMINGTYPE\n")
+    pfile.write("EXPENDITURE\n")
+except IOError as ex:
+    print("Error-", ex)
+finally:
+    pfile.close()
+    print("File created\n")
+
+try:
+    pfile = open("insurance.txt", "r")
+    for line in pfile:
+        print(line)
+except IOError as ex:
+    print(ex)
+finally:
+    pfile.close();
+
+# with clause
+with open("insurance.txt", "r") as pfile:
+    for line in pfile:
+        print(line)
+
+
+unloadfile.py:
+
+from openpyxl import Workbook
+import psycopg2
+import json
+import logging
+from openpyxl.reader.excel import load_workbook
+logging.basicConfig(filename="newfile.log",
+                    format='%(asctime)s %(levelno)s %(message)s',
+                    filemode='a',
+                    level=logging.DEBUG)
+logger = logging.getLogger()
+
+jsonFile = open("connection.json", )
+jsonReader=json.load(jsonFile)
+dbname= jsonReader["dbname"]
+user= jsonReader["user"]
+host=jsonReader["host"]
+password=jsonReader["password"]
+conn = None
+
+
+wb = Workbook()
+sheet = wb.active
+try:
+    conn = psycopg2.connect(f"dbname='{dbname}' user='{user}' host='{host}' password='{password}'")
+    print(conn)
+    logger.info("Connected to the database")
+
+except:
+    print("Unable to connect to database")
+    logger.error("Error in connecting to database")
+
+try:
+    cur = conn.cursor()
+    cur.execute("select * from insurance")
+
+
+    rows = cur.fetchall()
+
+    print("Retrieved data")
+    logger.info("Data retrieved from the database")
+    i = 0
+    for row in rows:
+        sheet.append( row)
+
+        i = i + 1
+
+
+except Exception as ex:
+    print("Error in fetching data", ex)
+    logger.error("Error in fetching data")
+finally:
+    conn.close()
+    wb.save('insurance_details.xlsx')
+    logger.info("Excel File saved..........")
+
+
+
+
+We have to install these two in our pycharm environment:
+
+1)pip install psycopg2
+2)pip install openpyxl
+
+Table Query:
+
+CREATE TABLE INSURANCE(INSURANCENAME VARCHAR(20),YEAR VARCHAR(20),EXPENDITURE VARCHAR(20));
+
+INSERT INTO INSURANCE VALUES('NAIS','2007-2012','5851.88')
+INSERT INTO INSURANCE VALUES('MNAIS','2010-2014','2899.45')
+INSERT INTO INSURANCE VALUES('WBCIS','2007-2014','4943.28')
+INSERT INTO INSURANCE VALUES('CPIS','2009-2014','3251.44')
+
+AFTER RUN:
+Retrieved data
+
+one newfile will generate:
+
+2021-08-31 17:20:43,502 20 Connected to the database
+2021-08-31 17:20:43,503 20 Data retrieved from the database
+2021-08-31 17:20:43,594 20 Excel File saved..........
+
+new excel file will generate:
+
+Insurancedetails.XLSX:
+
+NAIS	2007-2012	5851.88
+MNAIS	2010-2014	2899.45
+WBCIS	2007-2014	4943.28
+CPIS	2009-2014	3251.44
+
+
+
+
+
+
+
+2. Simulate LOAD operation from Employee excel file to a table after necessary validations .
+
+
+ANSWER:
+
+LOAD Employee:
+
+
+connection.json:
+
+{
+  "dbname":"Employee",
+  "user":"postgres",
+  "host":"localhost",
+  "password":"Sivakumar@1997"
+}
+
+dbcondemo.py:
+
+#pip install psycopg2
+import psycopg2
+
+try:
+    conn = psycopg2.connect("dbname='Employee' user='postgres' host='localhost' password='Sivakumar@1997'")
+    print(conn)
+except:
+    print("Unable to connect to database")
+
+
+logdemo.py:
+
+import logging
+
+# Create and configure logger
+logging.basicConfig(filename="newfile.log",
+                    format='%(asctime)s %(levelno)s %(message)s',
+                    filemode='a',
+                    level=logging.DEBUG)
+
+# Creating an object
+logger = logging.getLogger()
+
+# Setting the threshold of logger to DEBUG
+#logger.setLevel(logging.DEBUG)
+
+# Test messages
+logger.debug("Harmless debug Message")
+logger.info("Just an information")
+logger.warning("Its a Warning")
+logger.error("Did you try to divide by zero")
+logger.critical("Internet is down")
+
+
+readconnfromjson.py:
+
+#reading connection properties from json file
+
+import json
+jsonFile = open("connection.json",)
+jsonReader=json.load(jsonFile)
+dbname= jsonReader["dbname"]
+user= jsonReader["user"]
+host=jsonReader["host"]
+password=jsonReader["password"]
+
+
+
+exception.py:
+
+try:
+    pfile = open("employee.txt", "w")
+    pfile.write("EMPLOYEEID\n")
+    pfile.write("EMPLOYEENAME\n")
+    pfile.write("SALARY\n")
+except IOError as ex:
+    print("Error-", ex)
+finally:
+    pfile.close()
+    print("File created\n")
+
+try:
+    pfile = open("employee.txt", "r")
+    for line in pfile:
+        print(line)
+except IOError as ex:
+    print(ex)
+finally:
+    pfile.close();
+
+# with clause
+with open("employee.txt", "r") as pfile:
+    for line in pfile:
+        print(line)
+
+
+loadfile.py:
+
+import psycopg2
+import json
+from openpyxl.reader.excel import load_workbook
+
+book =load_workbook(r"C:/Users/HP PC/employeedetails.xlsx")
+
+
+sheet=book["Sheet1"]
+jsonFile = open("connection.json",)
+jsonReader=json.load(jsonFile)
+dbname= jsonReader["dbname"]
+user= jsonReader["user"]
+host=jsonReader["host"]
+password=jsonReader["password"]
+conn = psycopg2.connect("dbname='"+dbname+"' user='"+user+ "'host='"+host+"'password='"+password+"'")
+
+cursor = conn.cursor()
+
+if (len(employeeid))==4 
+    elif employeename ~= 'None'
+        elif salary > 0
+	    query = """INSERT INTO employee (employeeid,employeename,salary) VALUES (%s, %s, %s)"""
+        print("salary is invali")
+    print("employee name required")
+print("employee id is invalid")
+r=1
+while(sheet.cell(r,1).value!=None):
+    employeeId = sheet.cell(r,1).value
+    employeeName = sheet.cell(r,2).value
+    salary = sheet.cell(r,3).value
+    r+=1
+    values = (employeeId,employeeName,salary)
+    cursor.execute(query, values)
+values = []
+
+for row in sheet.rows:
+    for cell in row:
+        values.append(cell.value)
+print(values)
+cursor.close()
+
+conn.commit()
+
+conn.close()
+
+print("")
+print("Load Operation Done..!!")
+print("")
+
+
+
+employeedetails.xlsx:
+
+EMPLOYEEID	EMPLOYEENAME	SALARY
+E001		SIVA KUMAR	20000
+E002		RAJ  KUMAR	30000
+E003		RAVI KUMAR	40000
+E004		Rama 		60000
+
+We have to install these two in our pycharm environment:
+
+1)pip install psycopg2
+2)pip install openpyxl
+
+
+Table Query:
+
+CRAETE TABLE employee(employeeid varchar(10),employeename varchar(20),salary int);
+
+AFTER RUN:
+
+Load Operation Done...!!
+
+Table data :
+
+E001		SIVA KUMAR	20000
+E002		RAJ  KUMAR	30000
+E003		RAVI KUMAR	40000
+E004		Rama 		60000
+
+
+3. Store Employee objects in dictionary , try basic CRUD operations.
+
+(Use loggers and log the CRUD counters to a log file)
+
+ 
+ANSWER:
+
+
+CRUD on EMPLOYEE:
+
+entity:
+Employee.py:
+
+class Employee(object):
+    '''
+    classdocs
+    '''
+
+    def __init__(self, employee_id, employee_name,salary):
+        '''
+        Constructor
+        '''
+        self.__employee_id = employee_id
+        self.__employee_name = employee_name
+        self.__salary=salary
+ 
+    def get_employee_id(self):
+        return self.__employee_id
+
+    def get_employee_name(self):
+        return self.__employee_name
+
+    def get_salary(self):
+        return self.__salary
+
+    def set_employee_id(self, value):
+        self.__employee_id = value
+
+    def set_employee_name(self, value):
+        self.__employee_name = value
+
+    def set_salary(self, value):
+        self.__salary = value
+
+    def del_employee_id(self):
+        del self.__employee_id
+
+    def del_employee_name(self):
+        del self.__employee_name
+
+    def del_salary(self):
+        del self.__salary
+
+
+    def __str__(self):
+        return "Employee ID: " + self.get_employee_id() + " Employee Name: " + self.get_employee_name()+" Salary :"+self.get_salary()
+
+
+DAO:
+EmployeeDAODict.py:
+
+from excep.EmployeeExcep import EmployeeNotFoundException
+
+class Employee_Dict(object):
+    '''
+    classdocs
+    '''
+
+    def __init__(self):
+        self.__employee_dict = []
+
+    def add_employees_toDict(self, emp_obj):
+        self.__employee_dict.append(emp_obj)
+
+    def read_employees_Dict(self):
+        return [item.__str__() for item in self.__employee_dict]
+
+    def update_employees_Dict(self, emp_obj, salary):
+        if emp_obj in self.__employee_dict:
+            emp_obj.set_salary(salary)
+
+    def remove_employees_fromDict(self, employee_id):
+        flag = 0
+        print(employee_id)
+        for emp in self.__employee_dict:
+            if emp.get_employee_id.__eq__(employee_id):
+                print(emp)
+                self.__employee_dict.remove(emp)
+                flag = 1
+                break
+        if (flag == 0):
+            raise EmployeeNotFoundException()
+
+
+exception:
+EmployeeExcep.py:
+
+class EmployeeNotFoundException(Exception):
+    '''
+    classdocs
+    '''
+
+    def __init__(self, errormessage="Employee not found"):
+        '''
+        Constructor
+        '''
+        self.__errormessage = errormessage
+
+    def __str__(self):
+        return self.__errormessage
+
+
+
+main:
+EmployeeMain.py:
+
+
+from dao import Employee_Dict
+from entity import Employee
+import logging
+
+
+
+if __name__ == '__main__':
+    dict={"employee_id":"E001","employee_name":"Raja","salary":"30000"}
+    dict1 = {"employee_id": "E002", "employee_name": "Siva", "salary": "10000"}
+    '''
+    DICT
+    '''
+    logging.basicConfig(filename="newfile.log",
+                        format='%(asctime)s %(levelno)s %(message)s',
+                        filemode='a',
+                        level=logging.DEBUG)
+
+    print("\n\n Employees Dict CRUD operation:\n----------------------------")
+    logging.basicConfig(level=logging.DEBUG)
+
+    logger = logging.getLogger()
+
+    # Create_list
+    print("\nAdding Employees to the dict:")
+    emp_obj = Employee_Dict()
+    emp_obj.add_employees_toDict(dict)
+    emp_obj.add_employees_toDict(dict1)
+
+    # Read_list
+    print("\nReading from Employees dict:")
+    print(emp_obj.read_employees_Dict())
+
+
+    # Update_list
+    print("\nUpdating Dictionary..........")
+    dict["Salary"] = "20000"
+    print(emp_obj.read_employees_Dict())
+    logger.info("updating the Dictionary...")
+
+    print("\nDelete the Dictionary")
+    dict1.clear()
+    print(emp_obj.read_employees_Dict())
+
+    logger.info("Deleting the Dictionary...")
+
+
+After Run:
+
+output:
+
+Employees Dict CRUD operation:
+----------------------------
+
+Adding Employees to the dict:
+
+Reading from Employees dict:
+["{'employee_id': 'E001', 'employee_name': 'Raja', 'salary': '30000'}", "{'employee_id': 'E002', 'employee_name': 'Siva', 'salary': '10000'}"]
+
+Updating Dictionary..........
+["{'employee_id': 'E002', 'employee_name': 'Siva', 'salary': '10000', 'salary': '20000'}", "{'employee_id': 'E002', 'employee_name': 'Siva', 'salary': '10000'}"]
+
+Delete the Dictionary
+["{'employee_id': 'E001', 'employee_name': 'Raja', 'salary': '30000'}", '{}']
+
+
+one new file will generate :
+
+newfile.log:
+2021-09-01 15:12:51,038 20 updating the Dictionary...
+2021-09-01 15:12:51,039 20 Deleteing the Dictionary...
+
+
+
+4.Write a code to read a sentence as input and execute the logics:
+
+            Eg:
+
+                Input:          Im from India.
+
+ 
+
+            1. Convert upper case to lower case. (Output: im from india.)
+
+            2. Convert lower case to upper case.  (Output: IM FROM INDIA.)
+
+            3. Count number of vowels in the sentence.  (Output: 5)
+
+            4. Count number of words in the sentence.  (Output: 3)
+
+            5. Print the word which is starts from Vowel  (Output: 2)
+
+            6. Print reverse of the alternative words in the sentence.  (Output: mi from aidni.)
+
+            7. Seperate lower case letters and uppercase letters in different string variables.
+
+
+
+ANSWER:
+
+1)
+string = 'IM FROM INDIA.'
+print(string.lower())
+
+output:
+im from india.
+
+2)
+string = 'im from india.'
+print(string.upper())
+
+output:
+IM FROM INDIA.
+
+3)
+# Function to count vowel
+def vowel_count(str):
+    count = 0
+    vowel = set("aeiouAEIOU")
+    for alphabet in str:
+        if alphabet in vowel:
+            count = count + 1
+
+    print("No. of vowels :", count)
+str = "im from india."
+
+# Function Call
+vowel_count(str)
+
+output:
+No. of vowels : 5
+
+4)
+test_string = "iam from india."
+# to count words in string
+res = len(test_string.split())
+
+# printing result
+print("The number of words in string are : " + str(res))
+
+output:
+The number of words in string are : 3
+
+5)
+test_list = ["Im","from","India."]
+
+res =[]
+vow = "AEIOU"
+for sub in test_list:
+    flag = False
+
+    # checking for begin char
+    for ele in vow:
+        if sub.startswith(ele):
+            flag = True
+            break
+    if flag:
+        res.append(sub)
+
+# printing result
+print("The extracted words : " + str(res))
+
+output:
+The extracted words : ['Im', 'India.']
+
+6)
+def reverseWordSentence(Sentence):
+    words = Sentence.split(" ")
+    newWords = [word[::-1] for word in words]
+    newSentence = " ".join(newWords)
+    return newSentence
+Sentence = "im from india."
+print(reverseWordSentence(Sentence))
+
+output:
+mi morf .aidni
+
+7)
+def upperLower(string):
+    upper=""
+    lower=""
+    for index in range(len(string)):
+        if index % 2 == 0:
+            upper = upper + string[index]
+        if not (index % 2 == 0):
+            lower = lower + string[index]
+    print("Upper: "+upper)
+    print("Lower: "+lower)
+
+upperLower("Im from India.")
+
+output:
+Upper: II
+Lower: mfo ni.
+
+5. Excel Read and Write:Segregate an customer file ( libre office fomat )  with respect to bank account type(savings & current) into 2 output files.
+
+ANSWER:
+
+
+Customer.py:
+
+
+import pandas as pd
+import logging
+
+# Create and configure logger
+logging.basicConfig(filename="newfile.log",
+                    format='%(asctime)s %(levelno)s %(message)s',
+                    filemode='a',
+                    level=logging.DEBUG)
+
+# Creating an object
+logger = logging.getLogger()
+
+try:
+    #Read
+    df = pd.read_excel('C:/Users/HP PC/CustomerDetails.xlsx')
+    print(df.head())
+    print("Read opertion perform successfully......")
+except:
+    print("error in reading the file")
+    logging.error("Error in reading the File")
+
+try:
+    #Write
+    writer = pd.ExcelWriter('Customerdetails.xlsx')
+    df.to_excel(writer,'sheet')
+    writer.save()
+    print("Write opertion perform successfully......")
+except:
+    print("error in writing the file")
+    logging.error("Error in writing the File")
+
+# Filteration
+try:
+    df = pd.read_excel('C:/Users/HP PC/CustomerDetails.xlsx')
+    df_filtered = df[df['Account_type'] == 'Savings']
+    df_filtered1 = df[df['Account_type'] == 'Current']
+    print(df_filtered)
+    print(df_filtered1)
+    logging.info("Account type Filtered")
+except:
+    print("Error in Filtering the File")
+    logging.error("Error in Filtering the File")
+try:
+    writer = pd.ExcelWriter('SavingAccount.xlsx')
+    df_filtered.to_excel(writer, 'sheet')
+    writer.save()
+    writer = pd.ExcelWriter('CurrentAccount.xlsx')
+    df_filtered1.to_excel(writer, 'sheet')
+    writer.save()
+    print("Account type store into separte  File Successfully.....")
+    logging.info("Account type store into separte  File")
+
+except:
+    print("error in saving the file")
+    logging.error("Error in saving the File")
+
+finally:
+    print("filteration completed")
+    logging.info("Process Completed")
+
+CustomerDetails.xlsx data:
+
+Account_type	CustomerId
+Savings		C01
+Current		C02
+Savings		C03
+
+
+After Run:
+
+SavingAccount.xlsx :
+
+	Account_type	CustomerId
+0	Savings		C01
+2	Savings		C03
+
+CurrentAccount.xlsx:
+
+	Account_type	CustomerId
+1	Current		C02
+
+one new file will generate:
+newfile.log:
+
+2021-09-02 09:45:01,116 20 Account type Filtered
+2021-09-02 09:45:01,161 20 Account type store into separate  File
+2021-09-02 09:45:01,161 20 Process Completed
+
+
+
+
+6.Print the series:  10, 22, 46, 94, 190.....
+
+ANSWER:
+
+
+Series.py:
+
+sum=10
+print(sum,end=' ')
+for i in range(0,5):
+    sum=sum*2+2
+    print(sum,end=' ')
+
+Output:
+
+10 22 46 94 190 382 
+
+
+
+7. Print the values like as below:
+
+
+ANSWER:
+
+pattern.py:
+
+def spiralOrder(matrix):
+    ans = []
+
+    if (len(matrix) == 0):
+        return ans
+
+    R = len(matrix)
+    C = len(matrix[0])
+    seen = [[0 for i in range(C)] for j in range(R)]
+    dr = [0, 1, 0, -1]
+    dc = [1, 0, -1, 0]
+    r = 0
+    c = 0
+    di = 0
+    for i in range(R * C):
+        ans.append(matrix[r])
+        seen[r] = True
+        cr = r + dr[di]
+        cc = c + dc[di]
+
+        if (0 <= cr and cr < R and 0 <= cc and cc < C and not (seen[cr][cc])):
+            r = cr
+            c = cc
+        else:
+            di = (di + 1) % 4
+            r += dr[di]
+            c += dc[di]
+    return ans
+
+a = [[1, 2, 3, 4],
+     [5, 6, 7, 8],
+     [9, 10, 11, 12],
+     [13, 14, 15, 16]]
+
+for x in spiralOrder(a):
+    print(x,end=" ")
+print()
